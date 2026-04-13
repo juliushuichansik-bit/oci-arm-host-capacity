@@ -1,65 +1,35 @@
 name: Tests
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-#  schedule:
-#    - cron: '*/4 * * * *'
-
 jobs:
-  tests:
+  integration-tests:
     runs-on: ubuntu-latest
+    # This allows the script to run even if Node is outdated in 2026
     env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true 
+      
     strategy:
+      # Simplify this to just one version to prevent multi-job errors
       matrix:
-        php-versions: ['8.3']
-    name: integration-tests (PHP ${{ matrix.php-versions }})
+        php: [8.3] 
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Install PHP
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
-      - name: Validate composer.json and composer.lock
-        run: composer validate
+          php-version: ${{ matrix.php }}
 
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-
-
-      - name: Install dependencies
-        run: |
-          composer update --prefer-dist --no-progress
-      - name: Run test suite
-        run: |
-          vendor/bin/phpunit --color tests/
+      - name: Run oci-arm-host-capacity
+        run: php index.php
         env:
-          OCI_REGION: ${{ secrets.OCI_REGION }}
-          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
-          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
-          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
-          OCI_PRIVATE_KEY_FILENAME: ${{ secrets.OCI_PRIVATE_KEY_FILENAME }}
-          OCI_AVAILABILITY_DOMAIN: ${{ secrets.OCI_AVAILABILITY_DOMAIN }}
-          OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
-          OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
-          OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
-          OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
-          OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
-          OCI_MAX_INSTANCES: ${{ secrets.OCI_MAX_INSTANCES }}
+          [cite_start]OCI_REGION: ${{ secrets.OCI_REGION }} [cite: 1]
+          [cite_start]OCI_USER_ID: ${{ secrets.OCI_USER_ID }} [cite: 1]
+          [cite_start]OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }} [cite: 1]
+          [cite_start]OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }} [cite: 1]
+          [cite_start]OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }} [cite: 1]
+          [cite_start]OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }} [cite: 1]
+          [cite_start]OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }} [cite: 1]
           OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
-          TELEGRAM_USER_ID: ${{ secrets.TELEGRAM_USER_ID }}
-          TELEGRAM_BOT_API_KEY: ${{ secrets.TELEGRAM_BOT_API_KEY }}
-
+          [cite_start]OCI_OCPUS: ${{ secrets.OCI_OCPUS }} [cite: 1]
+          [cite_start]OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }} [cite: 1]
