@@ -2,14 +2,12 @@ name: Tests
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
-    # This allows the script to run even if Node is outdated in 2026
     env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true 
-      
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
     strategy:
-      # Simplify this to just one version to prevent multi-job errors
       matrix:
-        php: [8.3] 
+        php: [8.3]
 
     steps:
       - name: Checkout
@@ -23,13 +21,13 @@ jobs:
       - name: Run oci-arm-host-capacity
         run: php index.php
         env:
-          [cite_start]OCI_REGION: ${{ secrets.OCI_REGION }} [cite: 1]
-          [cite_start]OCI_USER_ID: ${{ secrets.OCI_USER_ID }} [cite: 1]
-          [cite_start]OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }} [cite: 1]
-          [cite_start]OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }} [cite: 1]
-          [cite_start]OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }} [cite: 1]
-          [cite_start]OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }} [cite: 1]
-          [cite_start]OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }} [cite: 1]
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
           OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
-          [cite_start]OCI_OCPUS: ${{ secrets.OCI_OCPUS }} [cite: 1]
-          [cite_start]OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }} [cite: 1]
+          OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
