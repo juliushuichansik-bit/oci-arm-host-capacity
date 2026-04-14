@@ -24,10 +24,13 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      # THIS IS THE MISSING FIX:
       - name: Install Dependencies
         run: composer install
 
+      # This creates the file the script is looking for
+      - name: Create Private Key File
+        run: echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
+        
       - name: Run oci-arm-host-capacity
         run: php index.php
         env:
@@ -35,7 +38,7 @@ jobs:
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
-          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_PRIVATE_KEY: ./private_key.pem
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
           OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
