@@ -11,10 +11,6 @@ jobs:
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
-    strategy:
-      matrix:
-        php: [8.3]
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,17 +18,14 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 8.3
 
       - name: Install Dependencies
         run: composer install
 
-      # Improved way to save the key to avoid formatting errors
       - name: Create Private Key File
-        env:
-          PRIVATE_KEY_DATA: ${{ secrets.OCI_PRIVATE_KEY }}
         run: |
-          echo "$PRIVATE_KEY_DATA" > private_key.pem
+          echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
       - name: Run oci-arm-host-capacity
