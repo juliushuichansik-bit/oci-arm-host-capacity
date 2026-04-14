@@ -23,9 +23,12 @@ jobs:
       - name: Install Dependencies
         run: composer install
 
+      # This is the safest way to handle a multi-line secret
       - name: Create Private Key File
+        env:
+          MY_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
+          echo "$MY_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
       - name: Run oci-arm-host-capacity
