@@ -27,8 +27,11 @@ jobs:
       - name: Install Dependencies
         run: composer install
 
+      # This creates the physical file from your GitHub Secret
       - name: Create Private Key File
-        run: echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
+        run: |
+          echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
 
       - name: Run oci-arm-host-capacity
         run: php index.php
@@ -37,7 +40,10 @@ jobs:
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
+          # We provide BOTH names here so the script can't miss it:
           OCI_PRIVATE_KEY: ./private_key.pem
+          OCI_PRIVATE_KEY_FILENAME: ./private_key.pem
+          OCI_PRIVATE_KEY_PASSPHRASE: ""
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
           OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
