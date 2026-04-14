@@ -1,29 +1,27 @@
-name: Tests
+name: oci-arm-host-capacity
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: "*/5 * * * *" # Runs every 5 minutes
 
 jobs:
-  integration-tests:
+  run-script:
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: '8.3'
+          extensions: openssl, mbstring
 
       - name: Install Dependencies
         run: composer install
 
-      # This is the safest way to handle a multi-line secret
       - name: Create Private Key File
         env:
           MY_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
@@ -32,17 +30,24 @@ jobs:
           chmod 600 private_key.pem
 
       - name: Run oci-arm-host-capacity
-        run: php index.php
         env:
+          # Authentication & Identity
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
-          OCI_PRIVATE_KEY: ./private_key.pem
-          OCI_PRIVATE_KEY_FILENAME: ./private_key.pem
-          OCI_PRIVATE_KEY_PASSPHRASE: ""
+          OCI_PRIVATE_KEY_FILENAME: "private_key.pem"
+          
+          # Networking & Image
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
           OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+          
+          # Server Resources (The missing parts)
+          OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
           OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
+          
+          # Debugging (Set to true to see full logs)
+          DEBUG: true
+        run: php index.php
